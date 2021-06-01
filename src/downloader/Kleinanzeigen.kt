@@ -1,26 +1,46 @@
 package downloader
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated
-import org.openqa.selenium.support.ui.WebDriverWait
-import java.time.Duration
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse.BodyHandlers
 
 class Kleinanzeigen {
-    fun main() {
-        val driver = FirefoxDriver()
-        val wait = WebDriverWait(driver, Duration.ofSeconds(10).toMillis())
-        try {
-            driver.get("https://google.com/ncr")
-            driver.findElement(By.name("q")).sendKeys("cheese" + Keys.ENTER)
-            val firstResult = wait.until(presenceOfElementLocated(By.cssSelector("h3")))
-            println(firstResult.getAttribute("textContent"))
-        } finally {
-            driver.quit()
+
+    private fun makeSingleString(elems: Elements): String{
+        if(elems.size == 0) return "None"
+        return elems.joinToString(" | ");
+    }
+
+    fun download(){
+        val doc = Jsoup
+            .connect("https://www.ebay-kleinanzeigen.de/s-haus-kaufen/seite:3/c208")
+            .get()
+
+        val items = doc.getElementsByClass("ad-listitem")
+
+        println(doc.title())
+        for(item in items){
+            val home = Home();
+
+            home.title = makeSingleString(item.getElementsByClass("ellipsis"))
+
+            val price = makeSingleString(item.getElementsByClass("aditem-main--middle--price"))
+            // home.price = // parse price
+
+            home.description = makeSingleString(item.getElementsByClass("aditem-main--middle--description"))
+            home.address = makeSingleString(item.getElementsByClass("aditem-main--top--left"))
+
+            val tags = item.getElementsByClass("simpletag") // Get square meters
+            val images = item.getElementsByClass("imagebox") // -> img -> src
         }
-        // https://www.selenium.dev/documentation/en/
+
+    }
+
+    fun main(){
+        download()
     }
 }
