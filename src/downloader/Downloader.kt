@@ -2,11 +2,6 @@ package downloader
 
 import java.util.*
 
-enum class Contract {
-    Buy,
-    Rent
-}
-
 interface Downloader {
-    fun download(plz: String, contract: Contract): MutableList<Home>
+    fun download(query: String, contract: Contract, page: Int): MutableList<Home>
 }
