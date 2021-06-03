@@ -2,7 +2,6 @@ package downloader
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import java.lang.RuntimeException
 
 class Kleinanzeigen : Downloader{
 
@@ -50,7 +49,7 @@ class Kleinanzeigen : Downloader{
             }
 
             if(currencies.size > 1) price.currency = Currency.Ambiguous
-            if(currencies.isEmpty()) price.currency = Currency.None
+            if(currencies.isEmpty()) price.currency = Currency.Other
             else price.currency = currencies.first()
 
             str = str.trim()
@@ -160,7 +159,6 @@ class Kleinanzeigen : Downloader{
                 prefix = "s-haus-mieten"
                 postfix = "c205"
             }
-            else -> throw RuntimeException("Unexpected contract type")
         }
 
         val url = "$baseUrl$prefix/seite:$page/$postfix"
@@ -174,9 +172,7 @@ class Kleinanzeigen : Downloader{
         val homes = ArrayList<Home>()
         for(item in items){
             val home = Home()
-
             home.contract = contract
-
             parsePrice(item, home)
             parseAddress(item, home)
             parseTitle(item, home)
@@ -185,9 +181,9 @@ class Kleinanzeigen : Downloader{
             parseTags(item, home)
             parseImages(item, home)
 
-            if(!home.isFaulty()) {
-                homes.add(home)
-            }
+            if(home.isFaulty()) continue
+
+            homes.add(home)
         }
 
         return homes

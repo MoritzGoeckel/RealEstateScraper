@@ -1,7 +1,5 @@
 package downloader
 
-import org.json.JSONObject
-
 enum class Type{
     Offer,
     Ask
@@ -37,13 +35,11 @@ data class Home(var title: String? = null,
                 var squareMeters: Double? = null,
                 var price: Price? = null,
                 var description: String? = null,
-                var images: ArrayList<String> = ArrayList<String>(),
+                var images: ArrayList<String> = ArrayList(),
                 var contract: Contract? = null,
                 var type: Type? = null,
                 var rooms: Double? = null,
                 var url: String? = null) {
-
-    var raw = JSONObject();
 
     fun isFaulty(): Boolean{
         return price == null
