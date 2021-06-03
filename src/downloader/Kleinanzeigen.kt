@@ -70,14 +70,7 @@ class Kleinanzeigen : Downloader{
             price.amount = parseDouble(str)
         }
 
-        if(prices.size == 1){
-            home.price = prices.first()
-            return
-        }
-
-        if(prices.size > 1){
-             home.price = prices.firstOrNull { it.amount != null }
-        }
+         home.price = prices.firstOrNull { it.amount != null }
     }
 
     private fun parseTitle(element: Element, home: Home){
