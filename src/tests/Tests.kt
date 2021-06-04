@@ -1,6 +1,8 @@
-import downloader.Contract
-import downloader.Downloader
-import downloader.Ebay
+package tests
+
+import structures.Contract
+import ingest.Downloader
+import ingest.portals.Ebay
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 

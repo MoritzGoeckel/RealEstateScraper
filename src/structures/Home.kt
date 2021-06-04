@@ -1,4 +1,4 @@
-package downloader
+package structures
 
 enum class Type{
     Offer,

@@ -1,4 +1,4 @@
-package downloader
+package experiments
 
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys

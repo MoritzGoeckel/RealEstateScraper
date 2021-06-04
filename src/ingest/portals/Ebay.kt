@@ -1,5 +1,7 @@
-package downloader
+package ingest.portals
 
+import ingest.*
+import structures.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 
@@ -24,11 +26,10 @@ private fun attributeOrNull(element: Element, attribute: String): String?{
     }
 }
 
-class Ebay : Downloader{
-
+class Ebay : Downloader {
     private val baseUrl = "https://www.ebay-kleinanzeigen.de/"
 
-    private fun priceFromString(str: String) : Price{
+    private fun priceFromString(str: String) : Price {
         val price = Price()
 
         val currencies = ArrayList<Currency>()
@@ -146,6 +147,7 @@ class Ebay : Downloader{
                    .mapNotNull { attributeOrNull(it, "data-imgsrc") }
         )
     }
+
 
     override fun download(query: String, contract: Contract, page: Int): MutableList<Home>{
         // TODO: Query is not used
