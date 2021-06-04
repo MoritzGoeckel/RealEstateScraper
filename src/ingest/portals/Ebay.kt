@@ -183,7 +183,7 @@ class Ebay : Downloader {
                 parseImages(it, home)
                 home
             }
-            .filter { !it.isFaulty() }
+            .filter(Home::isValid)
 
         return homes.toMutableList()
     }

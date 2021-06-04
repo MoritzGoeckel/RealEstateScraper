@@ -41,9 +41,14 @@ data class Home(var title: String? = null,
                 var rooms: Double? = null,
                 var url: String? = null) {
 
+    fun isValid(): Boolean{
+        return !isFaulty()
+    }
+
     fun isFaulty(): Boolean{
         return price == null
                 || url == null
+                || squareMeters == null
                 || faultiness() > 0.5
     }
 
