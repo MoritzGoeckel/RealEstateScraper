@@ -1,9 +1,17 @@
 # RealEstateScraper
 
 ### Roadmap
+
 -[ ] ImmoWelt
+ 
 -[ ] ImmoScout
--[ ] Kleinanzeigen (Moritz)
+ 
+-[x] Ebay (Moritz)
+
+-[ ] Downloader
+ 
 -[ ] Persistence
+ 
 -[ ] Frontend
+ 
 -[ ] Data cleaning

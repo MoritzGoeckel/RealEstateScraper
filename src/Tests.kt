@@ -11,7 +11,7 @@ class Tests {
         val homes = downloader.download("", Contract.Buy, 6)
         val avgFaultiness = homes.sumOf { it.faultiness() } / homes.size
 
-        assertTrue { avgFaultiness < 0.1 }
-        assertTrue { homes.size >= 25 }
+        assertTrue { avgFaultiness < 0.05 }
+        assertTrue { homes.size >= 20 }
     }
 }
