@@ -1,71 +1,84 @@
 package structures
 
 enum class Type{
+    None,
     Offer,
     Ask
 }
 
 enum class Contract {
+    None,
     Buy,
-    Rent
+    Rent,
 }
 
 enum class Currency{
+    None,
     EUR,
     USD,
-    None,
     Other,
     Ambiguous
 }
 
 data class Price(var type: Type = Type.None,
                  var currency: Currency = Currency.None,
-                 var amount: Double? = null){
+                 var amount: Double = Double.NaN){
 
     enum class Type{
         None,
         Negotiable,
         Normal
     }
-}
-
-data class Home(var title: String? = null,
-                var plz: String? = null,
-                var address: String? = null,
-                var squareMeters: Double? = null,
-                var price: Price? = null,
-                var description: String? = null,
-                var images: ArrayList<String> = ArrayList(),
-                var contract: Contract? = null,
-                var type: Type? = null,
-                var rooms: Double? = null,
-                var url: String? = null) {
 
     fun isValid(): Boolean{
         return !isFaulty()
     }
 
     fun isFaulty(): Boolean{
-        return price == null
-                || url == null
-                || squareMeters == null
+        return type == Type.None
+                || currency == Currency.None
+                || currency == Currency.Ambiguous
+                || amount.isNaN()
+    }
+}
+
+data class Home(var title: String = "",
+                var plz: String = "",
+                var address: String = "",
+                var squareMeters: Double = Double.NaN,
+                var price: Price = Price(),
+                var description: String = "",
+                var images: ArrayList<String> = ArrayList(),
+                var contract: Contract = Contract.None,
+                var type: Type = Type.None,
+                var rooms: Double = Double.NaN,
+                var url: String = "") {
+
+    fun isValid(): Boolean{
+        return !isFaulty()
+    }
+
+    fun isFaulty(): Boolean{
+        return price.isFaulty()
+                || url.isEmpty()
+                || squareMeters.isNaN()
                 || faultiness() > 0.5
     }
 
     fun faultiness(): Double{
         val numMembers = 11.0
         var numFaulty = 0
-        numFaulty += if(title == null) 1 else 0
-        numFaulty += if(plz == null) 1 else 0
-        numFaulty += if(address == null) 1 else 0
-        numFaulty += if(squareMeters == null) 1 else 0
-        numFaulty += if(price == null) 1 else 0
-        numFaulty += if(description == null) 1 else 0
+        numFaulty += if(title.isEmpty())  1 else 0
+        numFaulty += if(plz.isEmpty()) 1 else 0
+        numFaulty += if(address.isEmpty()) 1 else 0
+        numFaulty += if(squareMeters.isNaN()) 1 else 0
+        numFaulty += if(price.isFaulty()) 1 else 0
+        numFaulty += if(description.isEmpty()) 1 else 0
         numFaulty += if(images.isEmpty()) 1 else 0
-        numFaulty += if(contract == null) 1 else 0
-        numFaulty += if(type == null) 1 else 0
-        numFaulty += if(rooms == null) 1 else 0
-        numFaulty += if(url == null) 1 else 0
+        numFaulty += if(contract == Contract.None) 1 else 0
+        numFaulty += if(type == Type.None) 1 else 0
+        numFaulty += if(rooms.isNaN()) 1 else 0
+        numFaulty += if(url.isEmpty()) 1 else 0
         return numFaulty / numMembers
     }
 }

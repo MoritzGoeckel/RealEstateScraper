@@ -8,7 +8,11 @@ import kotlin.test.assertTrue
 import com.google.gson.GsonBuilder
 
 fun prettyPrint(any: Any): String {
-    val gson = GsonBuilder().setPrettyPrinting().create()
+    val gson = GsonBuilder()
+        .setPrettyPrinting()
+        .serializeSpecialFloatingPointValues()
+        .create()
+
     return gson.toJson(any)
 }
 
@@ -21,6 +25,8 @@ class Tests {
 
         homes.map(::prettyPrint)
              .map(::println)
+
+        println(homes.size)
 
         assertTrue { avgFaultiness < 0.05 }
         assertTrue { homes.size >= 20 }

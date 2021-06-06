@@ -1,30 +1,11 @@
 package ingest.portals
 
 import ingest.*
+import library.*
 import structures.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-
-private fun String.remove(str: String): String{
-    return this.replace(str, "", true)
-}
-
-private fun parseDouble(input: String?): Double?{
-    if(input == null) return null
-
-    return input.remove(".")
-        .replace(",", ".")
-        .trim()
-        .toDoubleOrNull()
-}
-
-private fun attributeOrNull(element: Element, attribute: String): String?{
-    return if (element.hasAttr(attribute) && element.attr(attribute).isNotEmpty()) {
-        element.attr(attribute)
-    } else {
-        null
-    }
-}
+import java.lang.RuntimeException
 
 class Ebay : Downloader {
     private val baseUrl = "https://www.ebay-kleinanzeigen.de/"
@@ -62,7 +43,7 @@ class Ebay : Downloader {
         if(priceStr == "Zu verschenken"){
             price.amount = 0.0
         } else {
-            price.amount = parseDouble(priceStr)
+            price.amount = priceStr.parseGermanDouble()
         }
 
         return price
@@ -70,26 +51,24 @@ class Ebay : Downloader {
 
     private fun parsePrice(element: Element, home: Home){
         home.price = element.getElementsByClass("aditem-main--middle--price")
-            .asSequence()
             .map(Element::text)
             .map(String::trim)
             .filter(String::isNotEmpty)
             .map(this::priceFromString)
-            .firstOrNull() { it.amount != null }
+            .firstOrDefault(::Price)
+
     }
 
     private fun parseTitle(element: Element, home: Home){
         home.title = element.getElementsByClass("ellipsis")
                             .joinToString(" | ", transform = Element::text)
-
-        if(home.title.isNullOrEmpty()) home.title = null
     }
 
     private fun parseUrl(element: Element, home: Home){
         home.url = element.getElementsByClass("ellipsis")
-                          .mapNotNull {  attributeOrNull(it, "href") }
+                          .mapNotNull {  it.attributeOrNull("href") }
                           .map { baseUrl + it }
-                          .firstOrNull()
+                          .firstOrDefault { "" }
     }
 
     private fun parseAddress(element: Element, home: Home){
@@ -117,8 +96,6 @@ class Ebay : Downloader {
     private fun parseDescription(element: Element, home: Home){
         home.description = element.getElementsByClass("aditem-main--middle--description")
                                   .joinToString(" | ", transform = Element::text)
-
-        if(home.description.isNullOrEmpty()) home.description = null
     }
 
     private fun parseTags(element: Element, home: Home){
@@ -130,21 +107,23 @@ class Ebay : Downloader {
                             home.type = Type.Ask
                         }
                         it.endsWith("m²") -> {
-                            home.squareMeters = parseDouble(it.remove("m²"))
+                            home.squareMeters = it.remove("m²")
+                                                  .parseGermanDouble()
                         }
                         it.endsWith("Zimmer") -> {
-                            home.rooms = parseDouble(it.remove("Zimmer"))
+                            home.rooms = it.remove("Zimmer")
+                                           .parseGermanDouble()
                         }
                     }
                 }
 
-        if(home.type == null) home.type = Type.Offer
+        if(home.type == Type.None) home.type = Type.Offer
     }
 
     private fun parseImages(element: Element, home: Home){
         home.images.addAll(
             element.getElementsByClass("imagebox")
-                   .mapNotNull { attributeOrNull(it, "data-imgsrc") }
+                   .mapNotNull { it.attributeOrNull("data-imgsrc") }
         )
     }
 
@@ -152,8 +131,8 @@ class Ebay : Downloader {
     override fun download(query: String, contract: Contract, page: Int): MutableList<Home>{
         // TODO: Query is not used
 
-        var prefix = ""
-        var postfix = ""
+        val prefix: String
+        val postfix: String
         when (contract) {
             Contract.Buy -> {
                 prefix = "s-haus-kaufen"
@@ -163,6 +142,7 @@ class Ebay : Downloader {
                 prefix = "s-haus-mieten"
                 postfix = "c205"
             }
+            else -> throw RuntimeException("Unexpected contract type")
         }
 
         val url = "$baseUrl$prefix/seite:$page/$postfix"
