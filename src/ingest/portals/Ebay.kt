@@ -8,7 +8,6 @@ import org.jsoup.nodes.Element
 import java.lang.RuntimeException
 
 class Ebay : Downloader {
-    private val baseUrl = "https://www.ebay-kleinanzeigen.de/"
 
     private fun priceFromString(str: String) : Price {
         val price = Price()
@@ -67,7 +66,7 @@ class Ebay : Downloader {
     private fun parseUrl(element: Element, home: Home){
         home.url = element.getElementsByClass("ellipsis")
                           .mapNotNull {  it.attributeOrNull("href") }
-                          .map { baseUrl + it }
+                          .map { BASEURL_EBAY + it }
                           .firstOrDefault { "" }
     }
 
@@ -145,7 +144,7 @@ class Ebay : Downloader {
             else -> throw RuntimeException("Unexpected contract type")
         }
 
-        val url = "$baseUrl$prefix/seite:$page/$postfix"
+        val url = "$BASEURL_EBAY$prefix/seite:$page/$postfix"
 
         val doc = Jsoup.connect(url)
                        .get()
