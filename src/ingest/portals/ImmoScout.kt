@@ -5,17 +5,9 @@ import library.parseGermanDouble
 import library.toCurrency
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import org.openqa.selenium.By
-import org.openqa.selenium.Keys
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.support.ui.ExpectedConditions
-import org.openqa.selenium.support.ui.WebDriverWait
 import structures.Contract
-import structures.Currency
 import structures.Home
 import structures.Price
-import java.time.Duration
-
 
 class ImmoScout : Downloader {
 
@@ -25,13 +17,13 @@ class ImmoScout : Downloader {
 
     private val parseMap: MutableMap<String,(Home, Element) -> Home> = mutableMapOf()
 
-    override fun download(query: String, contract: Contract, page: Int): MutableList<Home> {
+    override fun download(contract: Contract, page: Int): MutableList<Home> {
 
-        var doc = sendRequest(page)
-        var elements = doc.getElementsByClass("result-list__listing")
+        val doc = sendRequest(page)
+        val elements = doc.getElementsByClass("result-list__listing")
 
         return elements
-            .map{parse(it)}
+            .map(::parse)
             .toCollection(mutableListOf())
 
     }
@@ -67,8 +59,8 @@ class ImmoScout : Downloader {
 
         parseMap["price"] = { home: Home, element: Element ->
 
-            var price = Price()
-            var priceElements = element.getElementsByClass("result-list-entry__primary-criterion")
+            val price = Price()
+            val priceElements = element.getElementsByClass("result-list-entry__primary-criterion")
                 .first()
                 .text()
                 .split(" ")

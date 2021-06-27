@@ -18,10 +18,15 @@ fun String.parseGermanDouble(): Double{
         .toDoubleOrNaN()
 }
 
-fun String.toCurrency(): Currency{
-    return when(this) {
+fun String.toCurrency(): Currency {
+    return when (this) {
         "€" -> Currency.EUR
         "$" -> Currency.USD
         else -> Currency.Other
     }
+}
+
+fun String.matches(pattern: String): Boolean{
+    val regex = pattern.toRegex(RegexOption.IGNORE_CASE)
+    return this.matches(regex);
 }

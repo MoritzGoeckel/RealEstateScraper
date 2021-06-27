@@ -12,7 +12,7 @@ class Ebay : Downloader {
     private fun priceFromString(str: String) : Price {
         val price = Price()
 
-        val currencies = ArrayList<Currency>()
+        val currencies = mutableListOf<Currency>()
 
         var priceStr = str
         if(priceStr.contains('€')) {
@@ -55,7 +55,6 @@ class Ebay : Downloader {
             .filter(String::isNotEmpty)
             .map(this::priceFromString)
             .firstOrDefault(::Price)
-
     }
 
     private fun parseTitle(element: Element, home: Home){
@@ -126,10 +125,7 @@ class Ebay : Downloader {
         )
     }
 
-
-    override fun download(query: String, contract: Contract, page: Int): MutableList<Home>{
-        // TODO: Query is not used
-
+    override fun download(contract: Contract, page: Int): MutableList<Home>{
         val prefix: String
         val postfix: String
         when (contract) {
@@ -144,7 +140,7 @@ class Ebay : Downloader {
             else -> throw RuntimeException("Unexpected contract type")
         }
 
-        val url = "$BASEURL_EBAY$prefix/seite:$page/$postfix"
+        val url = "$BASEURL_EBAY$prefix/anzeige:angebote/seite:$page/$postfix"
 
         val doc = Jsoup.connect(url)
                        .get()

@@ -4,5 +4,5 @@ import structures.Contract
 import structures.Home
 
 interface Downloader {
-    fun download(query: String, contract: Contract, page: Int): MutableList<Home>
+    fun download(contract: Contract, page: Int): MutableList<Home>
 }
