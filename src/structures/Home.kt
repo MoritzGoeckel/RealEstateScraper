@@ -45,7 +45,7 @@ data class Price(var type: Type = Type.None,
 data class Home(var title: String = "",
                 var plz: String = "",
                 var address: String = "",
-                var squareMeters: Double = Double.NaN,
+                var squareMetres: Double = Double.NaN,
                 var price: Price = Price(),
                 var description: String = "",
                 var images: ArrayList<String> = ArrayList(),
@@ -61,7 +61,7 @@ data class Home(var title: String = "",
     fun isFaulty(): Boolean{
         return price.isFaulty()
                 || url.isEmpty()
-                || squareMeters.isNaN()
+                || squareMetres.isNaN()
                 || faultiness() > 0.5
     }
 
@@ -71,7 +71,7 @@ data class Home(var title: String = "",
         numFaulty += if(title.isEmpty())  1 else 0
         numFaulty += if(plz.isEmpty()) 1 else 0
         numFaulty += if(address.isEmpty()) 1 else 0
-        numFaulty += if(squareMeters.isNaN()) 1 else 0
+        numFaulty += if(squareMetres.isNaN()) 1 else 0
         numFaulty += if(price.isFaulty()) 1 else 0
         numFaulty += if(description.isEmpty()) 1 else 0
         numFaulty += if(images.isEmpty()) 1 else 0

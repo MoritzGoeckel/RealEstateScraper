@@ -106,7 +106,7 @@ class Ebay : Downloader {
                             home.type = Type.Ask
                         }
                         it.endsWith("m²") -> {
-                            home.squareMeters = it.remove("m²")
+                            home.squareMetres = it.remove("m²")
                                                   .parseGermanDouble()
                         }
                         it.endsWith("Zimmer") -> {

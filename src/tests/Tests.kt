@@ -6,6 +6,7 @@ import ingest.portals.Ebay
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 import com.google.gson.GsonBuilder
+import ingest.portals.ImmoScout
 
 fun prettyPrint(any: Any): String {
     val gson = GsonBuilder()
@@ -30,5 +31,18 @@ class Tests {
 
         assertTrue { avgFaultiness < 0.05 }
         assertTrue { homes.size >= 20 }
+    }
+
+    @Test
+    fun immoScoutDownloader(){
+        val downloader: Downloader = ImmoScout()
+        val homes = downloader.download("", Contract.Buy, 6)
+
+        homes.map(::prettyPrint)
+            .map(::println)
+
+        println(homes.size)
+
+        kotlin.test.assertTrue { homes.size >= 20 }
     }
 }
