@@ -5,6 +5,7 @@ import ingest.Downloader
 import library.parseGermanDouble
 import library.matches
 import library.remove
+import library.toCurrency
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -19,13 +20,20 @@ class ImmoWelt : Downloader {
         // 4 getListItems requests that each return 4 homes
 
         // TODO: Parameterize url to get a general entry point for parsing. Right now it is hardcoded for Stuttgart
+        // TODO: Maybe also include houses, not just apartments
+
+        val contractParam = when(contract){
+            Contract.Buy -> "kaufen"
+            Contract.Rent -> "mieten"
+            Contract.None -> throw Exception("Bad contract type")
+        }
 
         val homes = mutableListOf<Home>()
-        val connection = getPage("liste/stuttgart/wohnungen/kaufen", page)
+        val connection = getPage("liste/stuttgart/wohnungen/$contractParam", page)
         val doc = connection.get()
 
         doc.getElementsByClass("listitem")
-            .map{parseHome(it, Contract.Buy)}
+            .map{parseHome(it, contract)}
             .forEach(homes::add)
 
         val listItemsQuery = doc.getElementById("filterView").attr("value")
@@ -40,7 +48,7 @@ class ImmoWelt : Downloader {
         for(i in 4..4*4 step 4) {
             getListItems(response.cookies(), listItemsQuery, offset + i)
                 .getElementsByClass("listitem")
-                .map { parseHome(it, Contract.Buy) }
+                .map { parseHome(it, contract) }
                 .forEach(homes::add)
         }
 
@@ -194,14 +202,10 @@ class ImmoWelt : Downloader {
 
         val distinctCurrencies = currencies.map {it.value}.distinct()
 
-        if(distinctCurrencies.size > 1){
-            price.currency = Currency.Ambiguous
+        price.currency = if(distinctCurrencies.size > 1){
+            Currency.Ambiguous
         } else {
-            price.currency = when (distinctCurrencies.first()) {
-                "€" -> Currency.EUR
-                "$" -> Currency.EUR
-                else -> Currency.Other
-            }
+            distinctCurrencies.first().toCurrency()
         }
 
         val numbers = parseNumbers("[1-9][0-9]*\\.+[0-9][0-9]*(,[0-9][0-9]*)?", text)
